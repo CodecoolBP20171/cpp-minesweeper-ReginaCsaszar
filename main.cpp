@@ -2,6 +2,10 @@
 #include <random>
 
 namespace {
+
+    char mine = '*';
+    char empty = '.';
+
     class Minesweeper {
     public:
         Minesweeper(const size_t width, const size_t height, const int bomb)
@@ -26,24 +30,28 @@ namespace {
 
         void countNeighbours() {
 
-            for(int y = 0; y < height; y++)
-            {
-                for(int x = 0; x < width; x++)
-                {
-                    if (table[y*width+x] != '*') {
+            for(int y = 0; y < height; y++) {
+
+                for(int x = 0; x < width; x++) {
+
+                    if (table[y*width+x] != mine) {
+
                         int mineCount = 0;
-                        if (table[(y-1)*width+x] == '*') mineCount++;
-                        if (table[(y+1)*width+x] == '*') mineCount++;
+                        if (table[(y-1)*width+x] == mine) { mineCount++;}
+                        if (table[(y+1)*width+x] == mine) { mineCount++;}
+
                         if (x > 0) {
-                            if (table[(y-1)*width+x-1] == '*') mineCount++;
-                            if (table[y*width+x-1] == '*') mineCount++;
-                            if (table[(y+1)*width+x-1] == '*') mineCount++;
+                            if (table[(y-1)*width+x-1] == mine) { mineCount++;}
+                            if (table[y*width+x-1] == mine) { mineCount++;}
+                            if (table[(y+1)*width+x-1] == mine) { mineCount++;}
                         }
+
                         if (x < width-1) {
-                            if (table[(y-1)*width+x+1]== '*') mineCount++ ;
-                            if (table[y*width+x+1]== '*') mineCount++ ;
-                            if (table[(y+1)*width+x+1]== '*') mineCount++ ;
+                            if (table[(y-1)*width+x+1]== mine) { mineCount++ ;}
+                            if (table[y*width+x+1]== mine) { mineCount++ ;}
+                            if (table[(y+1)*width+x+1]== mine) { mineCount++ ;}
                         }
+
                         table[y*width+x] = mineCount +'0';
                     }
                 }
@@ -65,25 +73,21 @@ namespace {
 
     private:
         void fillTable() {
-            for(int i = 0; i < height*width; i++)
-            {
-                    table[i]  = '.';
-            }
 
+            for(int i = 0; i < height*width; i++) {
+                table[i] = empty;
+            }
 
             std::random_device rd;
             std::mt19937_64 gen(rd());
-
             std::uniform_int_distribution<size_t> randIndex(0, width*height);
 
-            for(int i = 0; i < mines; i++)
-            {
+            for(int i = 0; i < mines; i++) {
                 size_t m = randIndex(gen);
-                if(table[m] == '*') {
+                if(table[m] == mine) {
                     i--;
                 } else {
-                    table[m] = '*';
-                }
+                    table[m] = mine; }
             }
         }
 
