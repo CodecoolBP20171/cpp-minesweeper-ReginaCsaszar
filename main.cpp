@@ -5,6 +5,7 @@ namespace {
 
     char mine = '*';
     char empty = '.';
+    char space = '0';
 
     class Minesweeper {
     public:
@@ -71,6 +72,34 @@ namespace {
 
         }
 
+        void reveal(int x, int y) {
+
+            int index = y*width+x;
+            char *field = &table[index];
+
+            if ( *field == mine) {
+                std::cout <<"\nBOOOM! YOU DIED!"<<std::endl;
+
+            } else if ( *field == '0') {
+                char *revealTable = new char[width * height];
+
+                revealTable[index] = *field;
+                revealNeighboors(x, y, revealTable);
+
+                std::cout<<"\nThe reveal table content:\n\n";
+                for(int y = 0; y < height; y++) {
+                    for(int x = 0; x < width; x++) {
+                        std::cout <<revealTable[y*width+x]<<" "; }
+                    std::cout<<std::endl; }
+                delete[] revealTable;
+
+            } else {
+                std::cout <<"You revealed a number "<< *field <<std::endl;
+            }
+
+
+        }
+
     private:
         void fillTable() {
 
@@ -91,6 +120,49 @@ namespace {
             }
         }
 
+        void revealNeighboors(size_t x, size_t y, char *revealTable) {
+
+            if ((table[(y-1)*width+x] == space)&&(revealTable[(y-1)*width+x] != space)) {
+                revealTable[(y-1)*width+x] = space;
+                revealNeighboors(x, y-1, revealTable);
+            }
+            if ((table[(y+1)*width+x] == space)&&(revealTable[(y+1)*width+x] != space)) {
+                revealTable[(y+1)*width+x] = space;
+                revealNeighboors(x, y+1, revealTable);
+            }
+
+            if (x > 0) {
+                if ((table[(y-1)*width+x-1] == space)&&(revealTable[(y-1)*width+x-1] != space)) {
+                    revealTable[(y-1)*width+x-1] = space;
+                    revealNeighboors(x-1, y-1, revealTable);
+                }
+                if ((table[y*width+x-1] == space)&&(revealTable[y*width+x-1] != space)) {
+                    revealTable[y*width+x-1] = space;
+                    revealNeighboors(x-1, y, revealTable);
+                }
+                if ((table[(y+1)*width+x-1] == space)&&(revealTable[(y+1)*width+x-1] != space)) {
+                    revealTable[(y+1)*width+x-1] = space;
+                    revealNeighboors(x-1, y+1, revealTable);
+                }
+            }
+
+            if (x < width-1) {
+                if ((table[(y-1)*width+x+1]== space)&&(revealTable[(y-1)*width+x+1] != space)) {
+                    revealTable[(y-1)*width+x+1]= space;
+                    revealNeighboors(x+1, y-1, revealTable);
+                }
+                if ((table[y*width+x+1]== space)&&(revealTable[y*width+x+1] != space)) {
+                    revealTable[y*width+x+1] = space;
+                    revealNeighboors(x+1, y, revealTable);
+                }
+                if ((table[(y+1)*width+x+1]== space)&&(revealTable[(y+1)*width+x+1] != space)) {
+                    revealTable[(y+1)*width+x+1] = space;
+                    revealNeighboors(x+1, y+1, revealTable);
+
+                }
+            }
+        }
+
         const size_t width, height;
         const int mines;
         char *table;
@@ -103,6 +175,7 @@ int main() {
         ms.printTable();
         ms.countNeighbours();
         ms.printTable();
+        ms.reveal(5, 5);
     } catch (const std::bad_alloc &e) {
         std::cerr << "Couldn't allocate enough memory for minesweeper table" << std::endl;
         return EXIT_FAILURE;
